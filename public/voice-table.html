@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>原声表 - 销服一线员工沟通反馈平台</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background-color: #f3f4f6;
+      color: #374151;
+    }
+    
+    .navbar {
+      background-color: #fff;
+      border-bottom: 1px solid #e5e7eb;
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .navbar-brand {
+      font-weight: 600;
+      font-size: 1.125rem;
+      color: #1f2937;
+      text-decoration: none;
+    }
+    
+    .navbar-nav {
+      display: flex;
+      gap: 2rem;
+    }
+    
+    .nav-link {
+      text-decoration: none;
+      color: #6b7280;
+      font-size: 0.875rem;
+    }
+    
+    .nav-link.active {
+      color: #3b82f6;
+      font-weight: 500;
+    }
+    
+    .container {
+      padding: 1.5rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    
+    .page-header {
+      background: #fff;
+      padding: 1.25rem 1.5rem;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    .page-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #1f2937;
+    }
+    
+    .back-btn {
+      color: #3b82f6;
+      text-decoration: none;
+      font-size: 0.875rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .table-container {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    
+    .table-wrapper {
+      overflow-x: auto;
+    }
+    
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+    }
+    
+    .data-table th {
+      background-color: #f9fafb;
+      padding: 0.75rem 1rem;
+      text-align: left;
+      font-weight: 600;
+      color: #374151;
+      border-bottom: 1px solid #e5e7eb;
+      white-space: nowrap;
+    }
+    
+    .data-table td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid #f3f4f6;
+      max-width: 300px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    
+    .data-table tr:hover {
+      background-color: #f9fafb;
+    }
+    
+    .status-badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+    
+    .status-pending {
+      background-color: #f3f4f6;
+      color: #374151;
+    }
+    
+    .status-processing {
+      background-color: #dbeafe;
+      color: #1d4ed8;
+    }
+    
+    .status-ongoing {
+      background-color: #fef3c7;
+      color: #b45309;
+    }
+    
+    .status-completed {
+      background-color: #d1fae5;
+      color: #047857;
+    }
+    
+    .status-terminated {
+      background-color: #fee2e2;
+      color: #b91c1c;
+    }
+    
+    .filter-bar {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    
+    .filter-input {
+      padding: 0.5rem 0.75rem;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      min-width: 200px;
+    }
+    
+    .filter-select {
+      padding: 0.5rem 0.75rem;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      background: #fff;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="index.html" id="navbarBrand" class="navbar-brand">销服一线员工沟通反馈平台</a>
+    <div class="navbar-nav">
+      <a href="index.html" class="nav-link">管理看板</a>
+      <a href="voice-table.html" class="nav-link active">原声表</a>
+      <a href="demand-table.html" class="nav-link">需求表</a>
+      <a href="quality-table.html" class="nav-link">质检表</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="page-header">
+      <a href="index.html" class="back-btn">← 返回看板</a>
+      <h1 class="page-title">原声表</h1>
+    </div>
+
+    <div class="table-container">
+      <div class="filter-bar">
+        <input type="text" class="filter-input" id="searchInput" placeholder="搜索需求原声...">
+        <select class="filter-select" id="statusFilter">
+          <option value="">全部状态</option>
+          <option value="待处理">待处理</option>
+          <option value="已分流">已分流</option>
+          <option value="进行中">进行中</option>
+          <option value="已完成">已完成</option>
+          <option value="已终止">已终止</option>
+        </select>
+      </div>
+      <div class="table-wrapper">
+        <table class="data-table" id="voiceTable">
+          <thead>
+            <tr>
+              <th>原声序号</th>
+              <th>需求原声</th>
+              <th>需求提交时间</th>
+              <th>原声来源</th>
+              <th>提需人</th>
+              <th>是否实名</th>
+              <th>是否逾期</th>
+              <th>需求运营人</th>
+              <th>工单状态</th>
+              <th>合并前终止</th>
+              <th>合并前终止原因</th>
+              <th>合并需求编号</th>
+              <th>一级标签</th>
+              <th>二级标签</th>
+              <th>三级标签</th>
+            </tr>
+          </thead>
+          <tbody id="voiceTableBody">
+            <tr>
+              <td colspan="12" style="text-align: center; padding: 2rem;">加载中...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let allData = [];
+    let urlParams = {};
+    
+    function getUrlParams() {
+      const params = new URLSearchParams(window.location.search);
+      const result = {};
+      params.forEach((value, key) => {
+        result[key] = value;
+      });
+      return result;
+    }
+    
+    async function loadData() {
+      urlParams = getUrlParams();
+      
+      try {
+        let url = '/api/voice-data';
+        const queryParams = [];
+        if (urlParams.startDate) queryParams.push(`startDate=${encodeURIComponent(urlParams.startDate)}`);
+        if (urlParams.endDate) queryParams.push(`endDate=${encodeURIComponent(urlParams.endDate)}`);
+        if (urlParams.status) queryParams.push(`status=${encodeURIComponent(urlParams.status)}`);
+        
+        if (queryParams.length > 0) {
+          url += '?' + queryParams.join('&');
+        }
+        
+        const response = await fetch(url);
+        const data = await response.json();
+        allData = data.data || [];
+        
+        if (urlParams.status) {
+          document.getElementById('statusFilter').value = urlParams.status;
+        }
+        
+        renderTable(allData);
+      } catch (error) {
+        console.error('加载数据失败:', error);
+        document.getElementById('voiceTableBody').innerHTML = 
+          '<tr><td colspan="12" style="text-align: center; padding: 2rem; color: #ef4444;">加载失败，请刷新重试</td></tr>';
+      }
+    }
+    
+    function renderTable(data) {
+      const tbody = document.getElementById('voiceTableBody');
+      if (!data || data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="12" style="text-align: center; padding: 2rem;">暂无数据</td></tr>';
+        return;
+      }
+      
+      tbody.innerHTML = data.map(item => `
+        <tr>
+          <td>${item['原声序号'] || ''}</td>
+          <td title="${item['需求原声'] || ''}">${item['需求原声'] || ''}</td>
+          <td>${item['需求提交时间'] || ''}</td>
+          <td>${item['原声来源'] || ''}</td>
+          <td>${item['提需人'] || ''}</td>
+          <td>${item['是否实名'] || ''}</td>
+          <td>${item['是否逾期'] || ''}</td>
+          <td>${item['需求运营人'] || ''}</td>
+          <td><span class="status-badge status-${getStatusClass(item['工单状态'])}">${item['工单状态'] || ''}</span></td>
+          <td>${item['合并前终止'] || ''}</td>
+          <td title="${item['合并前终止原因'] || ''}">${item['合并前终止原因'] || ''}</td>
+          <td>${item['合并需求编号'] || ''}</td>
+          <td>${item['一级标签'] || ''}</td>
+          <td>${item['二级标签'] || ''}</td>
+          <td>${item['三级标签'] || ''}</td>
+        </tr>
+      `).join('');
+    }
+    
+    function getStatusClass(status) {
+      const map = {
+        '待处理': 'pending',
+        '已分流': 'processing',
+        '进行中': 'ongoing',
+        '已完成': 'completed',
+        '已终止': 'terminated'
+      };
+      return map[status] || 'pending';
+    }
+    
+    function filterData() {
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      const statusFilter = document.getElementById('statusFilter').value;
+      
+      const filtered = allData.filter(item => {
+        const matchesSearch = !searchTerm || (item['需求原声'] || '').toLowerCase().includes(searchTerm);
+        const matchesStatus = !statusFilter || item['工单状态'] === statusFilter;
+        return matchesSearch && matchesStatus;
+      });
+      
+      renderTable(filtered);
+    }
+    
+    document.getElementById('searchInput').addEventListener('input', filterData);
+    document.getElementById('statusFilter').addEventListener('change', filterData);
+    
+    loadData();
+    
+    function updateBackLinks() {
+      const urlParams = getUrlParams();
+      const dateParams = [];
+      if (urlParams.startDate) dateParams.push(`startDate=${encodeURIComponent(urlParams.startDate)}`);
+      if (urlParams.endDate) dateParams.push(`endDate=${encodeURIComponent(urlParams.endDate)}`);
+      
+      const backUrl = dateParams.length > 0 ? `index.html?${dateParams.join('&')}` : 'index.html';
+      
+      const navbarBrand = document.getElementById('navbarBrand');
+      if (navbarBrand) navbarBrand.href = backUrl;
+      
+      const navLinks = document.querySelectorAll('.nav-link[href="index.html"]');
+      navLinks.forEach(link => link.href = backUrl);
+      
+      const backBtn = document.querySelector('.back-btn[href="index.html"]');
+      if (backBtn) backBtn.href = backUrl;
+    }
+    
+    updateBackLinks();
+  </script>
+</body>
+</html>
