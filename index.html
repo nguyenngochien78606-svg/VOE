@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>管理看板 - 销服一线员工沟通反馈平台</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+      color: #1e293b;
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+    
+    .navbar {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    }
+    
+    .navbar-brand {
+      font-weight: 600;
+      font-size: 1.125rem;
+      color: #1f2937;
+    }
+    
+    .navbar-nav {
+      display: flex;
+      gap: 2rem;
+    }
+    
+    .nav-link {
+      text-decoration: none;
+      color: #6b7280;
+      font-size: 0.875rem;
+      transition: color 0.2s ease;
+    }
+    
+    .nav-link:hover {
+      color: #3b82f6;
+    }
+    
+    .nav-link.active {
+      color: #3b82f6;
+      font-weight: 500;
+    }
+    
+    .navbar-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    
+    .container {
+      padding: 1.5rem 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    
+    .filter-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding: 0.875rem 1.25rem;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      border-radius: 12px;
+      box-shadow: 
+        0 4px 16px rgba(0, 0, 0, 0.04),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    }
+    
+    .filter-bar input[type="date"] {
+      font-family: inherit;
+      font-size: 0.875rem;
+      padding: 0.5rem 0.875rem;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.8);
+      color: #374151;
+      transition: all 0.2s ease;
+    }
+    
+    .filter-bar input[type="date"]:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    .filter-info {
+      font-size: 0.875rem;
+      color: #6b7280;
+      font-weight: 500;
+    }
+    
+    .date-range {
+      display: flex;
+      align-items: center;
+      gap: 0.875rem;
+    }
+    
+    .date-range span {
+      color: #9ca3af;
+    }
+    
+    .stat-cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.875rem;
+      margin-bottom: 1.25rem;
+    }
+    
+    .stat-card {
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      border-radius: 14px;
+      padding: 1rem 1.25rem;
+      position: relative;
+      box-shadow: 
+        0 4px 16px rgba(0, 0, 0, 0.03),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      min-height: 180px;
+    }
+    
+    .stat-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 
+        0 12px 32px rgba(0, 0, 0, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    }
+    
+    .stat-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+    
+    .stat-label {
+      font-size: 0.8125rem;
+      color: #6b7280;
+      font-weight: 500;
+    }
+    
+    .stat-trend {
+      font-size: 0.7rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      background: rgba(239, 68, 68, 0.1);
+      color: #ef4444;
+      font-weight: 500;
+    }
+    
+    .stat-value-wrapper {
+      display: flex;
+      align-items: baseline;
+      gap: 0.375rem;
+      margin-bottom: 0.375rem;
+    }
+    
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #1e293b;
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+    
+    .stat-unit {
+      font-size: 0.75rem;
+      color: #9ca3af;
+    }
+    
+    .stat-trend {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.375rem 0.75rem;
+      border-radius: 20px;
+      background: rgba(148, 163, 184, 0.1);
+    }
+    
+    .stat-trend.trend-up {
+      color: #059669;
+      background: rgba(16, 185, 129, 0.1);
+    }
+    
+    .stat-trend.trend-down {
+      color: #dc2626;
+      background: rgba(239, 68, 68, 0.1);
+    }
+    
+    .trend-label {
+      font-weight: 400;
+      color: #9ca3af;
+      margin-right: 0.25rem;
+    }
+    
+    .stat-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: auto;
+      padding-top: 0.75rem;
+      border-top: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .stat-formula {
+      font-size: 0.7rem;
+      color: #9ca3af;
+      flex-shrink: 1;
+      flex-grow: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    
+    .stat-action {
+      font-size: 0.7rem;
+      color: #fff;
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      padding: 0.375rem 0.75rem;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 500;
+      display: inline-flex;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+      flex-shrink: 0;
+      white-space: nowrap;
+      margin-left: 0.5rem;
+    }
+    
+    .stat-action:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+    
+    .stat-card.warning {
+      border-left: 4px solid #ef4444;
+    }
+    
+    .stat-card.warning .stat-value {
+      color: #dc2626;
+    }
+    
+    .warning-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+      font-size: 0.75rem;
+      color: #dc2626;
+      font-weight: 600;
+      margin-top: 0.375rem;
+      margin-bottom: 0.375rem;
+    }
+    
+    .card {
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      border-radius: 16px;
+      box-shadow: 
+        0 4px 20px rgba(0, 0, 0, 0.03),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+      overflow: hidden;
+      transition: all 0.3s ease;
+      margin-bottom: 1.5rem;
+    }
+    
+    .card:hover {
+      box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.06),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    }
+    
+    .card-header {
+      background: rgba(255, 255, 255, 0.5);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      padding: 1.125rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .card-title {
+      font-weight: 600;
+      color: #1e293b;
+      font-size: 1.0625rem;
+    }
+    
+    .card-subtitle {
+      font-size: 0.875rem;
+      color: #64748b;
+      font-weight: 500;
+    }
+    
+    .card-body {
+      padding: 1.5rem;
+    }
+    
+    .chart-container {
+      height: 450px;
+      position: relative;
+      width: 100%;
+    }
+    
+    .chart-container canvas {
+      width: 100% !important;
+      height: 100% !important;
+    }
+    
+    .bar-chart-container {
+      display: flex;
+      flex-direction: column;
+      gap: 0.875rem;
+    }
+    
+    .bar-item {
+      display: flex;
+      align-items: center;
+      gap: 0.875rem;
+    }
+    
+    .bar-rank {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #fff;
+    }
+    
+    .bar-rank.rank-1 {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    }
+    
+    .bar-rank.rank-2 {
+      background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+    }
+    
+    .bar-rank.rank-3 {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    }
+    
+    .bar-rank.rank-other {
+      background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
+    }
+    
+    .bar-name {
+      width: 120px;
+      font-size: 0.875rem;
+      color: #374151;
+      font-weight: 500;
+    }
+    
+    .bar-wrapper {
+      flex: 1;
+      height: 28px;
+      background: rgba(148, 163, 184, 0.1);
+      border-radius: 8px;
+      overflow: hidden;
+      position: relative;
+    }
+    
+    .bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
+      border-radius: 8px;
+      transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .bar-stats {
+      display: flex;
+      gap: 0.75rem;
+      font-size: 0.8125rem;
+      color: #6b7280;
+      font-weight: 500;
+    }
+    
+    .lifecycle-container {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 1.25rem 0;
+    }
+    
+    .lifecycle-stage {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      padding: 1.25rem;
+      border-radius: 16px;
+      transition: all 0.3s ease;
+    }
+    
+    .lifecycle-stage:hover {
+      background: rgba(59, 130, 246, 0.05);
+      transform: translateY(-2px);
+    }
+    
+    .lifecycle-box {
+      width: 96px;
+      height: 96px;
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      box-shadow: 
+        0 8px 24px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+    
+    .lifecycle-box.pending {
+      background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+    }
+    
+    .lifecycle-box.processing {
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    }
+    
+    .lifecycle-box.ongoing {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    }
+    
+    .lifecycle-box.completed {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    }
+    
+    .lifecycle-label {
+      font-size: 0.8125rem;
+      color: #6b7280;
+      font-weight: 500;
+    }
+    
+    .lifecycle-arrow {
+      font-size: 1.75rem;
+      color: #d1d5db;
+    }
+    
+    .quick-view-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .quick-view-section {
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      border-radius: 16px;
+      box-shadow: 
+        0 4px 20px rgba(0, 0, 0, 0.03),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+      overflow: hidden;
+    }
+    
+    .quick-view-header {
+      padding: 1rem 1.25rem;
+      font-weight: 600;
+      color: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .quick-view-section.violation .quick-view-header {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    }
+    
+    .quick-view-section.organization .quick-view-header {
+      background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    }
+    
+    .quick-view-section.product .quick-view-header {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    }
+    
+    .quick-view-section.system .quick-view-header {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    }
+    
+    .quick-view-list {
+      padding: 0.5rem 0;
+      max-height: 220px;
+      overflow-y: auto;
+    }
+    
+    .quick-view-item {
+      padding: 0.875rem 1.25rem;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+      font-size: 0.875rem;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    
+    .quick-view-item:last-child {
+      border-bottom: none;
+    }
+    
+    .quick-view-item:hover {
+      background: rgba(59, 130, 246, 0.05);
+      padding-left: 1.5rem;
+    }
+    
+    .quick-view-title {
+      color: #1f2937;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      line-height: 1.4;
+    }
+    
+    .quick-view-meta {
+      display: flex;
+      gap: 1rem;
+      font-size: 0.75rem;
+      color: #6b7280;
+      align-items: center;
+    }
+    
+    .quick-view-badge {
+      padding: 0.25rem 0.625rem;
+      border-radius: 12px;
+      font-size: 0.7rem;
+      font-weight: 500;
+    }
+    
+    .quick-view-badge.pending {
+      background: #f3f4f6;
+      color: #6b7280;
+    }
+    
+    .quick-view-badge.processing {
+      background: #dbeafe;
+      color: #2563eb;
+    }
+    
+    .quick-view-badge.ongoing {
+      background: #fef3c7;
+      color: #d97706;
+    }
+    
+    .quick-view-badge.completed {
+      background: #d1fae5;
+      color: #059669;
+    }
+    
+    .quick-view-badge.terminated {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+    
+    .quick-view-rating {
+      padding: 0.25rem 0.625rem;
+      border-radius: 12px;
+      font-size: 0.7rem;
+      font-weight: 500;
+    }
+    
+    .quick-view-rating.rating-good {
+      background: #dcfce7;
+      color: #16a34a;
+    }
+    
+    .quick-view-rating.rating-bad {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+    
+    .quality-monitor-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.75rem;
+      background: rgba(255, 255, 255, 0.5);
+    }
+    
+    .quality-monitor-table th,
+    .quality-monitor-table td {
+      padding: 0.5rem 0.375rem;
+      text-align: center;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      border-right: 1px solid rgba(0, 0, 0, 0.03);
+      vertical-align: middle;
+      min-width: 50px;
+    }
+    
+    .quality-monitor-table th:last-child,
+    .quality-monitor-table td:last-child {
+      border-right: none;
+    }
+    
+    .quality-monitor-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+    
+    .quality-monitor-table thead th {
+      background: rgba(0, 0, 0, 0.02);
+      font-weight: 600;
+      color: #374151;
+      position: relative;
+      white-space: nowrap;
+      font-size: 0.7rem;
+    }
+    
+    .quality-monitor-table .section-header-top {
+      background: rgba(0, 0, 0, 0.03);
+      color: #374151;
+      font-weight: 600;
+      font-size: 0.75rem;
+      border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+      padding: 0.5rem;
+    }
+    
+    .quality-monitor-table .vertical-header {
+      background: rgba(0, 0, 0, 0.02);
+      border-bottom: 2px solid rgba(0, 0, 0, 0.05) !important;
+      width: 100px;
+    }
+    
+    .quality-monitor-table tbody tr:hover {
+      background: rgba(59, 130, 246, 0.03);
+    }
+    
+    .quality-monitor-table td:first-child {
+      text-align: left;
+      font-weight: 500;
+      background: rgba(0, 0, 0, 0.015);
+      white-space: nowrap;
+      width: 100px;
+      max-width: 120px;
+    }
+    
+    .quality-monitor-table .pass-rate {
+      font-weight: 600;
+      color: #059669;
+    }
+    
+    .quality-monitor-table .fail-count {
+      font-weight: 600;
+      color: #dc2626;
+    }
+    
+    .quality-monitor-table .jump-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.375rem 0.75rem;
+      background: rgba(255, 255, 255, 0.7);
+      color: #374151;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 8px;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      min-width: 36px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+    
+    .quality-monitor-table .jump-btn:hover {
+      background: rgba(59, 130, 246, 0.08);
+      border-color: #3b82f6;
+      color: #3b82f6;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.12);
+    }
+    
+    .warning-list {
+      padding: 0;
+    }
+    
+    .warning-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.25rem 1.5rem;
+      border-radius: 12px;
+      margin-bottom: 1rem;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+    }
+    
+    .warning-item:last-child {
+      margin-bottom: 0;
+    }
+    
+    .warning-item:hover {
+      transform: translateX(4px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+    }
+    
+    .warning-content {
+      flex: 1;
+      display: flex;
+      gap: 3rem;
+      min-width: 0;
+    }
+    
+    .warning-title {
+      font-size: 1rem;
+      color: #1e293b;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    
+    .warning-meta {
+      display: flex;
+      gap: 1.25rem;
+      font-size: 0.8125rem;
+      color: #6b7280;
+    }
+    
+    .score-badge {
+      font-size: 0.875rem;
+      font-weight: 600;
+      padding: 0.5rem 0.875rem;
+      border-radius: 20px;
+    }
+    
+    .warning-score-1 {
+      border-left: 4px solid #dc2626;
+    }
+    
+    .warning-score-1 .score-badge {
+      background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+      color: #fff;
+    }
+    
+    .warning-score-2 {
+      border-left: 4px solid #ef4444;
+    }
+    
+    .warning-score-2 .score-badge {
+      background: linear-gradient(135deg, #ef4444 0%, #f87171 100%);
+      color: #fff;
+    }
+    
+    .warning-score-3 {
+      border-left: 4px solid #fca5a5;
+    }
+    
+    .warning-score-3 .score-badge {
+      background: rgba(248, 113, 113, 0.12);
+      color: #ef4444;
+    }
+    
+    .activity-container {
+      border-top: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .activity-header {
+      padding: 0.875rem 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .activity-header:hover {
+      background: rgba(59, 130, 246, 0.04);
+    }
+    
+    .activity-title {
+      font-size: 0.9375rem;
+      font-weight: 500;
+      color: #374151;
+    }
+    
+    .activity-toggle {
+      font-size: 0.8125rem;
+      color: #3b82f6;
+      transition: transform 0.3s ease;
+    }
+    
+    .activity-toggle.expanded {
+      transform: rotate(180deg);
+    }
+    
+    .activity-list {
+      max-height: 320px;
+      overflow-y: auto;
+      background: rgba(0, 0, 0, 0.01);
+    }
+    
+    .activity-item {
+      padding: 0.875rem 1.25rem;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+      font-size: 0.875rem;
+      transition: all 0.2s ease;
+    }
+    
+    .activity-item:last-child {
+      border-bottom: none;
+    }
+    
+    .activity-item:hover {
+      background: rgba(59, 130, 246, 0.04);
+      padding-left: 1.5rem;
+    }
+    
+    .activity-content {
+      color: #374151;
+    }
+    
+    .activity-time {
+      font-size: 0.75rem;
+      color: #9ca3af;
+      margin-top: 0.375rem;
+    }
+    
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(245, 247, 250, 0.95);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+    
+    .loading-overlay.active {
+      display: flex;
+    }
+    
+    .loading-spinner {
+      text-align: center;
+      color: #3b82f6;
+      font-weight: 500;
+    }
+    
+    .period-tabs {
+      display: flex;
+      gap: 0.375rem;
+      background: rgba(148, 163, 184, 0.1);
+      padding: 0.375rem;
+      border-radius: 10px;
+    }
+    
+    .period-tab {
+      padding: 0.5rem 0.875rem;
+      border: none;
+      border-radius: 8px;
+      background: transparent;
+      font-size: 0.8125rem;
+      color: #6b7280;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-weight: 500;
+    }
+    
+    .period-tab:hover {
+      background: rgba(59, 130, 246, 0.08);
+      color: #3b82f6;
+    }
+    
+    .period-tab.active {
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(59, 130, 246, 0.25);
+    }
+    
+
+    
+    .chart-container.animate canvas {
+      animation: chartSlideIn 0.8s ease-out;
+    }
+    
+    @keyframes chartSlideIn {
+      from {
+        opacity: 0;
+        transform: translateX(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    
+    .bar-chart-container.animate .bar-fill {
+      animation: barGrow 0.8s ease-out forwards;
+    }
+    
+    @keyframes barGrow {
+      from {
+        width: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-brand">销服一线员工沟通反馈平台</div>
+    <div class="navbar-nav">
+      <a href="#" class="nav-link active">管理看板</a>
+      <a href="#" class="nav-link">原声表</a>
+      <a href="#" class="nav-link">需求表</a>
+      <a href="#" class="nav-link">质检表</a>
+    </div>
+    <div class="navbar-right">
+      <button class="btn-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3 4-3 9-3 9 1.34 9 3z"></path>
+        </svg>
+      </button>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="filter-bar">
+      <div class="filter-info" id="filterInfo">加载中...</div>
+      <div class="date-range">
+        <input type="date" id="startDate" value="2026-02-19">
+        <span>至</span>
+        <input type="date" id="endDate" value="2026-05-20">
+      </div>
+    </div>
+
+    <div class="stat-cards">
+      <div class="stat-card">
+        <div class="stat-card-header">
+          <div class="stat-label">总原声量</div>
+          <div class="stat-trend" id="totalVoiceTrend">--</div>
+        </div>
+        <div class="stat-value-wrapper">
+          <span class="stat-value" id="totalVoice">--</span>
+          <span class="stat-unit">个</span>
+        </div>
+        <div class="stat-footer">
+          <span class="stat-formula">统计周期内新增原声数量</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card-header">
+          <div class="stat-label">待处理原声</div>
+          <div class="stat-trend" id="pendingVoiceTrend">--</div>
+        </div>
+        <div class="stat-value-wrapper">
+          <span class="stat-value" id="pendingVoice">--</span>
+          <span class="stat-unit">个</span>
+        </div>
+        <div class="stat-footer">
+          <span class="stat-formula">状态为待处理的原声数量</span>
+          <a href="#" class="stat-action" data-target="voice-table.html" data-filter="status=待处理">原声表→</a>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card-header">
+          <div class="stat-label">总需求量</div>
+          <div class="stat-trend" id="totalDemandTrend">--</div>
+        </div>
+        <div class="stat-value-wrapper">
+          <span class="stat-value" id="totalDemand">--</span>
+          <span class="stat-unit">个</span>
+        </div>
+        <div class="stat-footer">
+          <span class="stat-formula">统计周期内新增需求数量</span>
+        </div>
+      </div>
+
+      <div class="stat-card warning">
+        <div class="stat-card-header">
+          <div class="stat-label">已逾期需求</div>
+          <div class="warning-badge">
+            <svg class="warning-icon" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0a9 9 0 0118 0z"></path>
+            </svg>
+            需立即关注
+          </div>
+        </div>
+        <div class="stat-value-wrapper">
+          <span class="stat-value" id="overdueDemand">--</span>
+          <span class="stat-unit">个</span>
+        </div>
+        <div class="stat-footer">
+          <span class="stat-formula">超过处理时限的需求数量</span>
+          <a href="#" class="stat-action" data-target="quality-table.html" data-filter="overdue=true">质检表→</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="stat-cards">
+      <div class="stat-card">
+        <div class="stat-card-header">
+          <div class="stat-label">完成需求量</div>
+          <div class="stat-trend" id="completedDemandTrend">--</div>
+        </div>
+        <div class="stat-value-wrapper">
+          <span class="stat-value" id="completedDemand">--</span>
+          <span class="stat-unit">个</span>
+        </div>
+        <div class="stat-footer">
+          <span class="stat-formula">统计周期内，已完成需求数/总需求数</span>
+          <a href="#" class="stat-action" data-target="demand-table.html" data-filter="status=已完成">需求表→</a>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card-header">
+          <div class="stat-label">原声终止率</div>
+          <div class="stat-trend" id="terminationRateTrend">--</div>
+        </div>
+        <div class="stat-value-wrapper">
+          <span class="stat-value" id="terminationRate">--</span>
+        </div>
+        <div class="stat-footer">
+          <span class="stat-formula">合并前终止原声量 / (总原声 - 待处理原声)</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card-header">
+          <div class="stat-label">原声合并率</div>
+          <div class="stat-trend" id="mergeRateTrend">--</div>
+        </div>
+        <div class="stat-value-wrapper">
+          <span class="stat-value" id="mergeRate">--</span>
+        </div>
+        <div class="stat-footer">
+          <span class="stat-formula">需求量 / (总原声 - 合并前终止 - 待处理原声)</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card-header">
+          <div class="stat-label">反馈合格率</div>
+          <div class="stat-trend" id="feedbackRateTrend">--</div>
+        </div>
+        <div class="stat-value-wrapper">
+          <span class="stat-value" id="feedbackRate">--</span>
+        </div>
+        <div class="stat-footer">
+          <span class="stat-formula">反馈合格的需求数/有反馈的需求数</span>
+          <a href="#" class="stat-action" data-target="quality-table.html" data-filter="qualified=false">质检表→</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">原声与需求转化趋势</span>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <span class="card-subtitle">周期：</span>
+          <div class="period-tabs">
+            <button class="period-tab active" data-period="day">日</button>
+            <button class="period-tab" data-period="week">周</button>
+            <button class="period-tab" data-period="month">月</button>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="chart-container" id="trendChartContainer">
+          <canvas id="trendChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">原声三级标签分布</span>
+        <span class="card-subtitle">TOP 5</span>
+      </div>
+      <div class="card-body">
+        <div class="bar-chart-container" id="categoryDistribution"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">需求状态生命周期</span>
+      </div>
+      <div class="card-body">
+        <div class="lifecycle-container" id="lifecycleContainer"></div>
+      </div>
+    </div>
+
+    <div class="quick-view-grid">
+      <div class="quick-view-section violation">
+        <div class="quick-view-header">
+          <span class="quick-view-header-title">违规反馈</span>
+          <span class="quick-view-header-count" id="violationCount">0</span>
+        </div>
+        <div class="quick-view-list" id="violationList"></div>
+      </div>
+      <div class="quick-view-section organization">
+        <div class="quick-view-header">
+          <span class="quick-view-header-title">组织建议</span>
+          <span class="quick-view-header-count" id="organizationCount">0</span>
+        </div>
+        <div class="quick-view-list" id="organizationList"></div>
+      </div>
+      <div class="quick-view-section product">
+        <div class="quick-view-header">
+          <span class="quick-view-header-title">产品建议</span>
+          <span class="quick-view-header-count" id="productCount">0</span>
+        </div>
+        <div class="quick-view-list" id="productList"></div>
+      </div>
+      <div class="quick-view-section system">
+        <div class="quick-view-header">
+          <span class="quick-view-header-title">制度建议</span>
+          <span class="quick-view-header-count" id="systemCount">0</span>
+        </div>
+        <div class="quick-view-list" id="systemList"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">反馈质量监控</span>
+      </div>
+      <div class="card-body" style="overflow-x: auto;">
+        <table class="quality-monitor-table" id="qualityTable">
+          <thead>
+            <tr>
+              <th class="vertical-header" rowspan="2">三级标签</th>
+              <th colspan="6" class="section-header-top">反馈基础数据</th>
+              <th colspan="6" class="section-header-top">AI质检数据</th>
+            </tr>
+            <tr>
+              <th>需求量</th>
+              <th>有反馈的需求量</th>
+              <th>反馈文案总数</th>
+              <th>进行中反馈数</th>
+              <th>总结反馈数</th>
+              <th>终止原因数</th>
+              <th>反馈合格需求数</th>
+              <th>反馈合格率</th>
+              <th>不合格反馈数</th>
+              <th>进度反馈不合格数</th>
+              <th>总结反馈不合格数</th>
+              <th>终止原因不合格数</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">处理时效监控</span>
+      </div>
+      <div class="card-body" style="overflow-x: auto;">
+        <table class="quality-monitor-table" id="timingTable">
+          <thead>
+            <tr>
+              <th class="vertical-header" rowspan="2">三级标签</th>
+              <th colspan="3" class="section-header-top">逾期情况</th>
+              <th colspan="3" class="section-header-top">逾期类型</th>
+              <th colspan="4" class="section-header-top">时长统计</th>
+              <th colspan="2" class="section-header-top">闭环时效</th>
+            </tr>
+            <tr>
+              <th>需求量</th>
+              <th>逾期量</th>
+              <th>逾期率</th>
+              <th>待处理逾期量</th>
+              <th>已分流逾期量</th>
+              <th>进行中逾期量</th>
+              <th>分流时长</th>
+              <th>启动时长</th>
+              <th>处理时长</th>
+              <th>总时长</th>
+              <th>已闭环需求量</th>
+              <th>按时闭环率</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">满意度低分警示</span>
+        <span class="card-subtitle">评分 ≤ 3分</span>
+      </div>
+      <div class="card-body">
+        <div class="warning-list" id="warningList"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="activity-container">
+        <div class="activity-header" id="activityHeader">
+          <span class="activity-title">全量处理动态</span>
+          <span class="activity-toggle">展开 ▼</span>
+        </div>
+        <div class="activity-list" id="activityList" style="display: none;"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner">加载中...</div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
